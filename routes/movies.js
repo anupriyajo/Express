@@ -2,11 +2,11 @@
 var mongoose   = require('mongoose');
 mongoose.connect('mongodb://localhost/movieDb');
 var Schema = mongoose.Schema;
-  var status = 'false';
+
 var movieSchema = new Schema({
  Title: String,
  Year:String,
- /*Rated:String,
+ Rated:String,
  Released:String,
  Runtime:String,
  Genre:String,
@@ -22,73 +22,129 @@ var movieSchema = new Schema({
  imdbRating:String,
  imdbVotes:String,
  imdbID:String,
- Type:String,*/
+ Type:String,
  Response:String
 });
 var movieModel = mongoose.model('movieModel', movieSchema);
-
-/*var kitty = new Cat({ name: 'Zildjian' });
-kitty.save(function (err) {
- if (err) {
-   console.log(err);
- } else {
-   console.log('meow');
- }
-});*/
 /**************************************************************************************************************************/
 
 var express = require('express');
 var router = express.Router();
 
-/*/Title/Harry Potter and the Deathly Hallows: Part 2/Year/2011/Rated/PG-13/Released/15 Jul 2011/Runtime/130 min/Genre/Adventure, Drama, Fantasy/Director/David Yates/Writer/Steve Kloves (screenplay), J.K. Rowling (novel)/Actors/Ralph Fiennes, Michael Gambon, Alan Rickman, Daniel Radcliffe/Plot/Harry, Ron and Hermione search for Voldemort's remaining Horcruxes in their effort to destroy the Dark Lord as the final battle rages on at Hogwarts./Language/English/Country/USA, UK/Awards/Nominated for 3 Oscars. Another 45 wins & 87 nominations./Poster/http://ia.media-imdb.com/images/M/MV5BMTY2MTk3MDQ1N15BMl5BanBnXkFtZTcwMzI4NzA2NQ@@._V1_SX300.jpg/Metascore/87/imdbRating/8.1/imdbVotes/530,955/imdbID/tt1201607/Type/movie/Response/True*/
-/*router.post('/add/Title/:Title/Year/:Year/Rated/:Rated/Released/:Released/Runtime/:Runtime/Genre/:Genre/Director/:Director/Writer/:Writer/Actors/:Actors/Plot/:Plot/Language/:Language/Country/:Country//Awards/:Awards/Poster/:Poster/Metascore/:Metascore/imdbRating/:imdbRating/imdbVotes/:imdbVotes/imdbID/:imdbID/Type/:Type/Response/:Response', function (req, res) {*/
-router.post('/add/Title/:Title/Year/:Year/Response/:Response',function(req,res){
+router.post('/add',function(req,res){
 
-  console.log("wwwwwwwwww");
   var newMovie = new movieModel( {
-    Title: req.params['Title'],
-    Year:req.params['Year'],
-    /*Rated:req.params['Rated'],
-    Released:req.params['Released'],
-    Runtime:req.params['Runtime'],
-    Genre:req.params['Genre'],
-    Director:req.params['Director'],
-    Writer:req.params['Writer'],
-    Actors:req.params['Actors'],
-    Plot:req.params['Plot'],
-    Language:req.params['Language'],
-    Country:req.params['Country'],
-    Awards:req.params['Awards'],
-    Poster:req.params['Poster'],
-    Metascore:req.params['Metascore'],
-    imdbRating:req.params['imdbRating'],
-    imdbVotes:req.params['imdbVotes'],
-    imdbID:req.params['imdbID'],
-    Type:req.params['Type'],*/
-    Response:req.params['Response']
+    Title:req.body.Title,
+    Year:req.body.Year,
+    Rated:req.body.Rated,
+    Released:req.body.Released,
+    Runtime:req.body.Runtime,
+    Genre:req.body.Genre,
+    Director:req.body.Director,
+    Writer:req.body.Writer,
+    Actors:req.body.Actors,
+    Plot:req.body.Plot,
+    Language:req.body.Language,
+    Country:req.body.Country,
+    Awards:req.body.Awards,
+    Poster:req.body.Poster,
+    Metascore:req.body.Metascore,
+    imdbRating:req.body.imdbRating,
+    imdbVotes:req.body.imdbVotes,
+    imdbID:req.body.imdbID,
+    Type:req.body.Type,
+    Response:req.body.Response
   });
-  console.log("eeeeeeeee");
   newMovie.save(function (err) {
    if (err) {
      console.log(err);
    } else {
-     status = 'true';
-     console.log('meow');
+     console.log('movie saved');
    }
   });
-  res.send(status);
+  res.send(newMovie);
 });
 
-router.delete('/delete', function (req, res) {
-  res.send('delete');
+router.delete('/delete/:id', function (req, res) {
+var id = req.params['id'];
+movieModel.findById(id,function(err,movie){
+return movie.remove(function(err){
+  if(err){
+    return err;
+    console.log("not deleted");
+  }else{
+    console.log('removed');
+    return res.send('delete');
+  }
+});
 });
 
-router.put('/update', function (req, res) {
-  res.send('update');
+res.send('movies delete successfully');
 });
 
-router.get('/find', function (req, res) {
-  res.send('find');
+router.put('/update/_id/:id',function(req,res){
+var id=req.params['id'];
+return movieModel.findById(id, function(err,movie){
+
+   movie.Title=req.body.Title;
+   movie.Year=req.body.Year;
+   movie.Rated=req.body.Rated;
+   movie.Released=req.body.Released,
+   movie.Runtime=req.body.Runtime,
+   movie.Genre=req.body.Genre,
+   movie.Director=req.body.Director,
+   movie.Writer=req.body.Writer,
+   movie.Actors=req.body.Actors,
+   movie.Plot=req.body.Plot,
+   movie.Language=req.body.Language,
+   movie.Country=req.body.Country,
+   movie.Awards=req.body.Awards,
+   movie.Poster=req.body.Poster,
+   movie.Metascore=req.body.Metascore,
+   movie.imdbRating=req.body.imdbRating,
+   movie.imdbVotes=req.body.imdbVotes,
+   movie.imdbID=req.body.imdbID,
+   movie.Type=req.body.Type,
+   movie.Response=req.body.Response;
+
+console.log(movie);
+ movie.save(function(err){
+   if(err){
+     return console.log(err);
+   }
+   else{
+     console.log('updated');
+   }
+   res.send(movie);
+ })
+});
+
+res.send('movies updated successfully');
+});
+
+router.get('/findAll', function (req, res) {
+  movieModel.find(function(err,movie){
+    if(err){
+      console.log(err);
+    }else{
+      return res.send(movie);
+    }
+  })
+});
+
+router.get('/findbyId/_id/:id',function(req,res){
+
+var id=req.params['id'];
+return movieModel.findById(id,function(err,movie){
+ if(err){
+   console.log("Error ");
+   return console.log(err);
+ }else{
+   console.log('success');
+   return res.send(movie);
+ }
+});
+ res.send('movie found');
 });
 
 module.exports = router;
